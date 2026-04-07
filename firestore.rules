@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Competitors — read-only from client
+    match /competitors/{competitorId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Sources — read-only from client
+    match /sources/{sourceId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Signals — read from client, write only from functions
+    match /signals/{signalId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Company summaries — read-only from client
+    match /company_summaries/{competitorId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Crawl state — internal, no client access
+    match /crawl_state/{stateId} {
+      allow read, write: if false;
+    }
+
+    // Digests — internal, no client access
+    match /digests/{digestId} {
+      allow read, write: if false;
+    }
+  }
+}

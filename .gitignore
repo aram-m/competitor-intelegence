@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local Firebase and agent workspace state
+.firebase/
+.agents/
+.claude/
