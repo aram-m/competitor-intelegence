@@ -169,7 +169,14 @@ export const COMPETITOR_SEEDS: CompetitorSeed[] = [
     category: "vaults",
     website: "https://chaoslabs.xyz",
     sources: [
-      { type: "blog", url: "https://chaoslabs.xyz/blog" },
+      {
+        type: "blog",
+        url: "https://chaoslabs.xyz/blog",
+        config: {
+          selector: "a[href*='/posts/']",
+          allowedUrlPattern: "^https://chaoslabs\\.xyz/posts/",
+        },
+      },
       {
         type: "github",
         url: "https://github.com/ChaosLabsInc",

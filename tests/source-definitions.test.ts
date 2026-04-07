@@ -114,3 +114,19 @@ test("chorus one blog is restricted to real article cards and article urls", () 
     },
   });
 });
+
+test("chaos labs blog is restricted to real post urls", () => {
+  const chaosLabs = COMPETITOR_SEEDS.find(
+    (competitor) => competitor.slug === "chaos-labs",
+  );
+  const blogSource = chaosLabs?.sources.find((source) => source.type === "blog");
+
+  assert.deepEqual(blogSource, {
+    type: "blog",
+    url: "https://chaoslabs.xyz/blog",
+    config: {
+      selector: "a[href*='/posts/']",
+      allowedUrlPattern: "^https://chaoslabs\\.xyz/posts/",
+    },
+  });
+});

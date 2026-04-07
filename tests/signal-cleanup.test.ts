@@ -169,3 +169,36 @@ test("planSignalCleanup drops Chorus One category and external blog rows", () =>
     ],
   );
 });
+
+test("planSignalCleanup drops Chaos Labs non-post website rows", () => {
+  const deletions = planSignalCleanup({
+    signals: [
+      {
+        id: "chaos-about",
+        competitorId: "chaos-labs",
+        sourceId: "chaos-labs-blog-1",
+        sourceType: "blog",
+        url: "https://chaoslabs.xyz/about",
+        createdAt: "2026-04-06T10:00:00.000Z",
+      },
+      {
+        id: "chaos-post",
+        competitorId: "chaos-labs",
+        sourceId: "chaos-labs-blog-1",
+        sourceType: "blog",
+        url: "https://chaoslabs.xyz/posts/when-pricing-becomes-execution-chaos-oracles-are-live-on-tempo",
+        createdAt: "2026-04-06T10:01:00.000Z",
+      },
+    ],
+    sources: [
+      {
+        id: "chaos-labs-blog-1",
+        type: "blog",
+        isActive: true,
+        allowedUrlPattern: "^https://chaoslabs\\.xyz/posts/",
+      },
+    ],
+  });
+
+  assert.deepEqual(deletions, [{ id: "chaos-about", reason: "invalid_blog_url" }]);
+});
