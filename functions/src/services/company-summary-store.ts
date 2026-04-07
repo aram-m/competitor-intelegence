@@ -2,6 +2,10 @@ import * as admin from "firebase-admin";
 import type { Priority, Signal, SourceType } from "../types";
 import type { CompanyBriefResult } from "../summary/company-brief";
 import { PRIORITIES } from "../types";
+import {
+  FALLBACK_RECOMMENDED_ACTION,
+  FALLBACK_SUMMARY,
+} from "../classifier/llm";
 
 const db = admin.firestore;
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
@@ -57,8 +61,18 @@ export async function listRecentSignalsByCompetitor(
   return grouped;
 }
 
-function getStrongestPriority(signals: Signal[]): Priority {
-  return signals.reduce<Priority>((current, signal) => {
+export function isReliablePrioritySignal(signal: Signal): boolean {
+  return !(
+    signal.summary === FALLBACK_SUMMARY &&
+    signal.recommendedAction === FALLBACK_RECOMMENDED_ACTION
+  );
+}
+
+export function getStrongestPriorityForSummary(signals: Signal[]): Priority {
+  const reliableSignals = signals.filter(isReliablePrioritySignal);
+  const candidates = reliableSignals.length > 0 ? reliableSignals : [];
+
+  return candidates.reduce<Priority>((current, signal) => {
     return comparePriority(signal.priority, current) < 0 ? signal.priority : current;
   }, "low");
 }
@@ -86,7 +100,7 @@ export async function storeCompanySummary(
       competitorName: latestSignal.competitorName,
       recentCount: signals.length,
       sourceTypes: getSourceTypes(signals),
-      strongestPriority: getStrongestPriority(signals),
+      strongestPriority: getStrongestPriorityForSummary(signals),
       latestSignalAt: admin.firestore.Timestamp.fromDate(getSignalDate(latestSignal)),
       windowStart: admin.firestore.Timestamp.fromDate(windowStart),
       summary: brief.summary,

@@ -1,17 +1,15 @@
-import type { Signal, Priority, SignalType, SourceType } from "@/types";
+import type { Signal, Priority, SourceType } from "@/types";
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
 export interface Filters {
   companies: string[];
-  signalTypes: SignalType[];
   sourceTypes: SourceType[];
   priorities: Priority[];
 }
 
 export const EMPTY_FILTERS: Filters = {
   companies: [],
-  signalTypes: [],
   sourceTypes: [],
   priorities: [],
 };
@@ -36,12 +34,6 @@ export function applySignalFilters(
     if (
       filters.companies.length > 0 &&
       !filters.companies.includes(signal.competitorId)
-    ) {
-      return false;
-    }
-    if (
-      filters.signalTypes.length > 0 &&
-      !filters.signalTypes.includes(signal.signalType)
     ) {
       return false;
     }

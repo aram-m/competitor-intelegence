@@ -98,3 +98,19 @@ test("kiln uses an explicit official svg logo asset", () => {
     "https://cdn.prod.website-files.com/625db3caa8abd6c22d5f0ce3/668f029c2bb9c2f43db8fe05_Kiln%20-%20logo%20-%202024.svg",
   );
 });
+
+test("chorus one blog is restricted to real article cards and article urls", () => {
+  const chorusOne = COMPETITOR_SEEDS.find(
+    (competitor) => competitor.slug === "chorus-one",
+  );
+  const blogSource = chorusOne?.sources.find((source) => source.type === "blog");
+
+  assert.deepEqual(blogSource, {
+    type: "blog",
+    url: "https://chorus.one/blog",
+    config: {
+      selector: ".articleslist .articleitem",
+      allowedUrlPattern: "^https://chorus\\.one/articles/",
+    },
+  });
+});

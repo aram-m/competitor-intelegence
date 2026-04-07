@@ -1,19 +1,9 @@
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MultiSelect } from "./multi-select";
-import type { Competitor, SignalType, Priority, SourceType } from "@/types";
-import {
-  SIGNAL_TYPE_LABELS,
-  PRIORITY_LABELS,
-} from "@/types";
+import type { Competitor, Priority, SourceType } from "@/types";
+import { PRIORITY_LABELS } from "@/types";
 import type { Filters } from "@/hooks/use-filters";
-
-const signalTypeOptions = (Object.keys(SIGNAL_TYPE_LABELS) as SignalType[]).map(
-  (key) => ({
-    value: key,
-    label: SIGNAL_TYPE_LABELS[key],
-  }),
-);
 
 const priorityOptions = (Object.keys(PRIORITY_LABELS) as Priority[]).map(
   (key) => ({
@@ -27,7 +17,6 @@ export function FilterBar({
   sourceTypeOptions,
   filters,
   onCompaniesChange,
-  onSignalTypesChange,
   onSourceTypesChange,
   onPrioritiesChange,
   onClear,
@@ -37,7 +26,6 @@ export function FilterBar({
   sourceTypeOptions: { value: SourceType; label: string }[];
   filters: Filters;
   onCompaniesChange: (ids: string[]) => void;
-  onSignalTypesChange: (types: SignalType[]) => void;
   onSourceTypesChange: (types: SourceType[]) => void;
   onPrioritiesChange: (priorities: Priority[]) => void;
   onClear: () => void;
@@ -66,12 +54,6 @@ export function FilterBar({
         selected={filters.companies}
         onChange={onCompaniesChange}
         placeholder="All Companies"
-      />
-      <MultiSelect
-        options={signalTypeOptions}
-        selected={filters.signalTypes}
-        onChange={(v) => onSignalTypesChange(v as SignalType[])}
-        placeholder="All Types"
       />
       <MultiSelect
         options={sourceTypeOptions}

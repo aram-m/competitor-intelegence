@@ -122,3 +122,50 @@ test("planSignalCleanup drops blog urls outside a source's allowed post pattern"
 
   assert.deepEqual(deletions, [{ id: "kiln-about", reason: "invalid_blog_url" }]);
 });
+
+test("planSignalCleanup drops Chorus One category and external blog rows", () => {
+  const deletions = planSignalCleanup({
+    signals: [
+      {
+        id: "chorus-category",
+        competitorId: "chorus-one",
+        sourceId: "chorus-one-blog-1",
+        sourceType: "blog",
+        url: "https://chorus.one/categories/networks",
+        createdAt: "2026-04-06T10:00:00.000Z",
+      },
+      {
+        id: "chorus-external",
+        competitorId: "chorus-one",
+        sourceId: "chorus-one-blog-1",
+        sourceType: "blog",
+        url: "https://enterprise.ledger.com/",
+        createdAt: "2026-04-06T10:01:00.000Z",
+      },
+      {
+        id: "chorus-article",
+        competitorId: "chorus-one",
+        sourceId: "chorus-one-blog-1",
+        sourceType: "blog",
+        url: "https://chorus.one/articles/real-post",
+        createdAt: "2026-04-06T10:02:00.000Z",
+      },
+    ],
+    sources: [
+      {
+        id: "chorus-one-blog-1",
+        type: "blog",
+        isActive: true,
+        allowedUrlPattern: "^https://chorus\\.one/articles/",
+      },
+    ],
+  });
+
+  assert.deepEqual(
+    deletions.sort((left, right) => left.id.localeCompare(right.id)),
+    [
+      { id: "chorus-category", reason: "invalid_blog_url" },
+      { id: "chorus-external", reason: "invalid_blog_url" },
+    ],
+  );
+});

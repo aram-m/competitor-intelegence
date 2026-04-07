@@ -146,3 +146,7 @@
     transition: color 160ms ease, opacity 160ms ease, background-color 160ms ease;
   }
 }
+
+.mobile-swipe-deck {
+  touch-action: pan-y;
+}

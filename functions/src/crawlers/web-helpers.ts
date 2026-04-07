@@ -27,6 +27,7 @@ const HIRING_TITLE_SELECTORS = [
 ];
 
 const BLOG_TITLE_SELECTORS = [
+  ".subheader_2",
   "[itemprop='headline']",
   ".text-size-medium.text-weight-medium",
   ".blog_article-wrapper .text-size-medium",

@@ -57,11 +57,14 @@ Important:
 - Keep "recommendedAction" to 14 words or fewer.
 `;
 
-const FALLBACK: ClassificationResult = {
+export const FALLBACK_SUMMARY = "Unable to classify — review manually.";
+export const FALLBACK_RECOMMENDED_ACTION = "Review the source material directly.";
+
+export const FALLBACK: ClassificationResult = {
   signalType: "other",
   priority: "medium",
-  summary: "Unable to classify — review manually.",
-  recommendedAction: "Review the source material directly.",
+  summary: FALLBACK_SUMMARY,
+  recommendedAction: FALLBACK_RECOMMENDED_ACTION,
 };
 
 function getClient() {

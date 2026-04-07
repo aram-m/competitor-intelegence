@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import type { SignalType, Priority, SourceType } from "@/types";
+import type { Priority, SourceType } from "@/types";
 import {
   applySignalFilters,
   EMPTY_FILTERS,
@@ -13,10 +13,6 @@ export function useFilters() {
 
   const setCompanies = useCallback((companies: string[]) => {
     setFilters((prev) => ({ ...prev, companies }));
-  }, []);
-
-  const setSignalTypes = useCallback((signalTypes: SignalType[]) => {
-    setFilters((prev) => ({ ...prev, signalTypes }));
   }, []);
 
   const setSourceTypes = useCallback((sourceTypes: SourceType[]) => {
@@ -34,7 +30,6 @@ export function useFilters() {
   const hasActiveFilters = useMemo(
     () =>
       filters.companies.length > 0 ||
-      filters.signalTypes.length > 0 ||
       filters.sourceTypes.length > 0 ||
       filters.priorities.length > 0,
     [filters],
@@ -47,7 +42,6 @@ export function useFilters() {
   return {
     filters,
     setCompanies,
-    setSignalTypes,
     setSourceTypes,
     setPriorities,
     clearFilters,

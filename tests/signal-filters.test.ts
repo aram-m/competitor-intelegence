@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  applySignalFilters,
-  getRecentSignalWindowStart,
-  type Filters,
-} from "../src/lib/signal-filters";
+import { applySignalFilters, getRecentSignalWindowStart, type Filters } from "../src/lib/signal-filters";
 import type { Signal } from "../src/types";
 
 const baseSignal = {
@@ -27,7 +23,6 @@ const baseSignal = {
 function makeFilters(overrides: Partial<Filters>): Filters {
   return {
     companies: [],
-    signalTypes: [],
     sourceTypes: [],
     priorities: [],
     ...overrides,
@@ -50,21 +45,21 @@ test("applySignalFilters filters by source type", () => {
   );
 });
 
-test("applySignalFilters can combine source type with signal type", () => {
+test("applySignalFilters can combine source type with priority", () => {
   const signals = [
     { ...baseSignal, id: "1", sourceType: "github", signalType: "technical" },
-    { ...baseSignal, id: "2", sourceType: "hiring", signalType: "other" },
-    { ...baseSignal, id: "3", sourceType: "hiring", signalType: "technical" },
+    { ...baseSignal, id: "2", sourceType: "hiring", priority: "medium" },
+    { ...baseSignal, id: "3", sourceType: "hiring", priority: "high" },
   ] as Signal[];
 
   const filtered = applySignalFilters(signals, makeFilters({
     sourceTypes: ["hiring"],
-    signalTypes: ["other"],
+    priorities: ["high"],
   }));
 
   assert.deepEqual(
     filtered.map((signal) => signal.id),
-    ["2"],
+    ["3"],
   );
 });
 

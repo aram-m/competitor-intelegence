@@ -21,7 +21,6 @@ export function Dashboard() {
   const {
     filters,
     setCompanies,
-    setSignalTypes,
     setSourceTypes,
     setPriorities,
     clearFilters,
@@ -69,7 +68,7 @@ export function Dashboard() {
     <div className="bg-background min-h-screen">
       <Header />
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_top_right,rgba(43,89,255,0.22),transparent_24rem),linear-gradient(180deg,rgba(14,19,30,0.98),rgba(8,11,18,0.98))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.45)] sm:p-8">
+        <div className="mb-8 hidden overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_top_right,rgba(43,89,255,0.22),transparent_24rem),linear-gradient(180deg,rgba(14,19,30,0.98),rgba(8,11,18,0.98))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.45)] md:block sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-primary/90">
@@ -110,13 +109,12 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 hidden md:block">
           <FilterBar
             competitors={competitors}
             sourceTypeOptions={sourceTypeOptions}
             filters={filters}
             onCompaniesChange={setCompanies}
-            onSignalTypesChange={setSignalTypes}
             onSourceTypesChange={setSourceTypes}
             onPrioritiesChange={setPriorities}
             onClear={clearFilters}

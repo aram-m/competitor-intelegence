@@ -86,7 +86,14 @@ export const COMPETITOR_SEEDS: CompetitorSeed[] = [
     category: "staking",
     website: "https://chorus.one",
     sources: [
-      { type: "blog", url: "https://chorus.one/blog" },
+      {
+        type: "blog",
+        url: "https://chorus.one/blog",
+        config: {
+          selector: ".articleslist .articleitem",
+          allowedUrlPattern: "^https://chorus\\.one/articles/",
+        },
+      },
       {
         type: "github",
         url: "https://github.com/ChorusOne",
