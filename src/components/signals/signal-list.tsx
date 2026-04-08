@@ -16,6 +16,7 @@ import {
   resolveMobileCarouselSelection,
   resolveSwipeDeckTargetIndex,
 } from "@/lib/company-carousel";
+import { getSignalDisplaySummary } from "@/lib/signal-presentation";
 import { getSourceTypeLabel } from "@/lib/source-presentation";
 import { cn } from "@/lib/utils";
 
@@ -214,6 +215,7 @@ function DesktopCompanyCard({
             {card.summary.featuredSignals.map((signal) => {
               const signalDate =
                 signal.publishedAt?.toDate?.() ?? signal.createdAt?.toDate?.() ?? null;
+              const displaySummary = getSignalDisplaySummary(signal);
 
               return (
                 <a
@@ -243,9 +245,11 @@ function DesktopCompanyCard({
                   <h3 className="mt-2 text-sm font-semibold leading-5 text-white">
                     {signal.title}
                   </h3>
-                  <p className="mt-1 text-sm leading-6 text-[#b7c2de]">
-                    {signal.summary}
-                  </p>
+                  {displaySummary ? (
+                    <p className="mt-1 text-sm leading-6 text-[#b7c2de]">
+                      {displaySummary}
+                    </p>
+                  ) : null}
                 </a>
               );
             })}

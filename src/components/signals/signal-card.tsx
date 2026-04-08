@@ -5,6 +5,10 @@ import { cn } from "@/lib/utils";
 import type { Signal } from "@/types";
 import { SIGNAL_TYPE_LABELS } from "@/types";
 import { getSourceTypeLabel } from "@/lib/source-presentation";
+import {
+  getSignalDisplayRecommendedAction,
+  getSignalDisplaySummary,
+} from "@/lib/signal-presentation";
 
 const priorityStyles: Record<string, string> = {
   critical: "border-l-red-500 bg-red-500/5",
@@ -53,6 +57,8 @@ export function SignalCard({ signal }: { signal: Signal }) {
   const publishedDate = signal.publishedAt?.toDate
     ? signal.publishedAt.toDate()
     : new Date();
+  const displaySummary = getSignalDisplaySummary(signal);
+  const displayRecommendedAction = getSignalDisplayRecommendedAction(signal);
 
   return (
     <Card
@@ -105,17 +111,19 @@ export function SignalCard({ signal }: { signal: Signal }) {
           </a>
 
           {/* Summary */}
-          <p className="text-muted-foreground mb-2 text-sm leading-relaxed">
-            {signal.summary}
-          </p>
+          {displaySummary ? (
+            <p className="text-muted-foreground mb-2 text-sm leading-relaxed">
+              {displaySummary}
+            </p>
+          ) : null}
 
           {/* Recommended action */}
-          {signal.recommendedAction && (
+          {displayRecommendedAction && (
             <div className="bg-muted/50 rounded-md px-3 py-2">
               <span className="text-xs font-medium uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 Recommended Action
               </span>
-              <p className="mt-0.5 text-sm">{signal.recommendedAction}</p>
+              <p className="mt-0.5 text-sm">{displayRecommendedAction}</p>
             </div>
           )}
         </div>

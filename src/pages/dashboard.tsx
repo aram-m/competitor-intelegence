@@ -75,7 +75,7 @@ export function Dashboard() {
                 P2P competitive watch
               </div>
               <h2 className="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
-                One AI brief per company. Only the last 30 days that matter.
+                What they did. Why it matters. Right now.
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-[#a9b5d3]">
                 Track blog, GitHub, and hiring motion across the competitor set with
