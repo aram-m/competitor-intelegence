@@ -1,5 +1,6 @@
-import type { DigestPayload } from "../types";
+import type { AlertPayload, NotificationChannelName } from "../types";
 
 export interface NotificationChannel {
-  send(payload: DigestPayload): Promise<void>;
+  readonly channel: NotificationChannelName;
+  send(payload: AlertPayload): Promise<void>;
 }

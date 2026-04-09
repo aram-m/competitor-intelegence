@@ -15,6 +15,10 @@ import {
 } from "../services/crawl-state";
 import { storeSignal } from "../services/signal-store";
 import { refreshCompanySummaries } from "../services/company-summary-refresh";
+import {
+  createAndDispatchAlert,
+  dispatchPendingAlerts,
+} from "../services/alerts";
 import type { Source } from "../types";
 
 const crawlers: Record<string, BaseCrawler> = {
@@ -36,6 +40,7 @@ async function runCrawl() {
   console.log(`Found ${sourcesSnap.size} active sources`);
 
   let totalSignals = 0;
+  const newSignalIds: string[] = [];
 
   for (const doc of sourcesSnap.docs) {
     const source = { id: doc.id, ...doc.data() } as Source;
@@ -63,8 +68,11 @@ async function runCrawl() {
             source.competitorName,
             source.type,
           );
-          await storeSignal(source, item, classification);
-          totalSignals++;
+          const result = await storeSignal(source, item, classification);
+          if (result.isNew) {
+            totalSignals++;
+            newSignalIds.push(result.id);
+          }
           console.log(
             `  Stored: [${classification.priority}] ${item.title}`,
           );
@@ -85,6 +93,16 @@ async function runCrawl() {
 
   const summaryCount = await refreshCompanySummaries();
   console.log(`Company summaries refreshed: ${summaryCount}.`);
+  const retriedCount = await dispatchPendingAlerts();
+  if (retriedCount > 0) {
+    console.log(`Retried ${retriedCount} pending/failed alert(s).`);
+  }
+  if (newSignalIds.length > 0) {
+    const alertId = await createAndDispatchAlert(newSignalIds);
+    if (alertId) {
+      console.log(`Alert dispatched for crawl run: ${alertId}.`);
+    }
+  }
 
   console.log(`Crawl complete. ${totalSignals} new signals stored.`);
   return totalSignals;

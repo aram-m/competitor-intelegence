@@ -40,6 +40,12 @@ cp .env.example .env
 
 - `GEMINI_API_KEY` for server-side Gemini classification
 - `GITHUB_TOKEN` if you want authenticated GitHub crawling
+- optional alerting:
+  - `ENABLE_ALERTS=true`
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_CHAT_ID`
+  - `SLACK_BOT_TOKEN`
+  - `SLACK_CHANNEL_ID`
 
 3. Build functions:
 

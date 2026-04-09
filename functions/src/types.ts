@@ -15,6 +15,8 @@ export type SignalType =
   | "other";
 
 export type Priority = "critical" | "high" | "medium" | "low";
+export type NotificationChannelName = "telegram" | "slack";
+export type AlertStatus = "pending" | "sent" | "partial" | "failed";
 
 export interface Competitor {
   id: string;
@@ -103,6 +105,42 @@ export interface Digest {
   error?: string;
 }
 
+export interface AlertCompany {
+  competitorId: string;
+  competitorName: string;
+  brief: Pick<
+    CompanySummary,
+    "summary" | "whyItMatters" | "watchNext" | "generatedBy" | "strongestPriority"
+  >;
+  signals: Signal[];
+}
+
+export interface AlertPayload {
+  alertId: string;
+  signalIds: string[];
+  competitorIds: string[];
+  generatedAt: Date;
+  companies: AlertCompany[];
+}
+
+export interface AlertChannelResult {
+  channel: NotificationChannelName;
+  status: "sent" | "failed";
+  error?: string;
+}
+
+export interface AlertRecord {
+  id: string;
+  signalIds: string[];
+  competitorIds: string[];
+  channelsRequested: NotificationChannelName[];
+  channelResults: AlertChannelResult[];
+  status: AlertStatus;
+  createdAt: Timestamp;
+  sentAt?: Timestamp;
+  error?: string;
+}
+
 export interface RawCrawlItem {
   title: string;
   url: string;
@@ -120,6 +158,11 @@ export interface ClassificationResult {
 export interface DigestPayload {
   signals: Signal[];
   generatedAt: Date;
+}
+
+export interface StoreSignalResult {
+  id: string;
+  isNew: boolean;
 }
 
 export const SIGNAL_TYPES: SignalType[] = [

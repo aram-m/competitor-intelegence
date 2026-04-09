@@ -1,7 +1,11 @@
 import TelegramBot from "node-telegram-bot-api";
 import type { NotificationChannel } from "./channel";
-import type { DigestPayload, Signal, Priority } from "../types";
-import { getTelegramConfig } from "../config";
+import type { AlertPayload, Priority, Signal } from "../types";
+import type { TelegramConfig } from "../config";
+import {
+  FALLBACK_RECOMMENDED_ACTION,
+  FALLBACK_SUMMARY,
+} from "../classifier/llm";
 
 const PRIORITY_EMOJI: Record<Priority, string> = {
   critical: "🔴",
@@ -24,11 +28,15 @@ const SIGNAL_TYPE_LABEL: Record<string, string> = {
 function formatSignal(s: Signal): string {
   const emoji = PRIORITY_EMOJI[s.priority];
   const typeLabel = SIGNAL_TYPE_LABEL[s.signalType] || s.signalType;
+  const summary = s.summary === FALLBACK_SUMMARY ? "" : `\n${escapeHtml(s.summary)}`;
+  const action =
+    s.recommendedAction === FALLBACK_RECOMMENDED_ACTION
+      ? ""
+      : `\n<i>Action: ${escapeHtml(s.recommendedAction)}</i>`;
   return (
     `${emoji} <b>[${s.priority.toUpperCase()}]</b> ${escapeHtml(s.competitorName)} — ${escapeHtml(typeLabel)}\n` +
     `<a href="${s.url}">${escapeHtml(s.title)}</a>\n` +
-    `${escapeHtml(s.summary)}\n` +
-    `<i>Action: ${escapeHtml(s.recommendedAction)}</i>`
+    `${summary}${action}`
   );
 }
 
@@ -49,43 +57,48 @@ function groupByPriority(signals: Signal[]): Map<Priority, Signal[]> {
   return map;
 }
 
-export class TelegramChannel implements NotificationChannel {
-  private bot: TelegramBot;
-  private chatId: string;
+export function buildTelegramMessages(payload: AlertPayload): string[] {
+  const parts: string[] = [];
 
-  constructor() {
-    const { telegramBotToken, telegramChatId } = getTelegramConfig();
-    this.chatId = telegramChatId;
-    this.bot = new TelegramBot(telegramBotToken);
-  }
+  parts.push(
+    `<b>📡 Competitive Watch Alert</b>\n` +
+      `<i>${payload.generatedAt.toISOString()}</i> — ${payload.signalIds.length} new signal(s)\n`,
+  );
 
-  async send(payload: DigestPayload): Promise<void> {
-    const { signals } = payload;
-    if (signals.length === 0) return;
-
-    const grouped = groupByPriority(signals);
-    const parts: string[] = [];
-
+  for (const company of payload.companies) {
     parts.push(
-      `<b>📊 Competitor Intelligence Digest</b>\n` +
-        `<i>${payload.generatedAt.toISOString().split("T")[0]}</i> — ${signals.length} signal(s)\n`,
+      `\n<b>${escapeHtml(company.competitorName)}</b>\n` +
+        `${escapeHtml(company.brief.summary)}\n` +
+        `<i>Why it matters:</i> ${escapeHtml(company.brief.whyItMatters)}\n` +
+        `<i>Watch next:</i> ${escapeHtml(company.brief.watchNext)}\n`,
     );
 
+    const grouped = groupByPriority(company.signals.slice(0, 5));
     for (const [priority, items] of grouped) {
       if (items.length === 0) continue;
-      parts.push(
-        `\n<b>— ${priority.toUpperCase()} (${items.length}) —</b>\n`,
-      );
+      parts.push(`\n<b>${priority.toUpperCase()} signals</b>\n`);
       for (const signal of items) {
         parts.push(formatSignal(signal));
       }
     }
+  }
 
-    // Split into Telegram-safe chunks (4096 char limit)
-    const fullMessage = parts.join("\n");
-    const chunks = splitMessage(fullMessage, 4096);
+  return splitMessage(parts.join("\n"), 4096);
+}
 
-    for (const chunk of chunks) {
+export class TelegramChannel implements NotificationChannel {
+  readonly channel = "telegram" as const;
+  private bot: TelegramBot;
+  private chatId: string;
+
+  constructor(config: TelegramConfig) {
+    const { telegramBotToken, telegramChatId } = config;
+    this.chatId = telegramChatId;
+    this.bot = new TelegramBot(telegramBotToken);
+  }
+
+  async send(payload: AlertPayload): Promise<void> {
+    for (const chunk of buildTelegramMessages(payload)) {
       await this.bot.sendMessage(this.chatId, chunk, {
         parse_mode: "HTML",
         disable_web_page_preview: true,

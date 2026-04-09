@@ -1,5 +1,11 @@
 import * as admin from "firebase-admin";
-import type { RawCrawlItem, ClassificationResult, Source } from "../types";
+import type {
+  RawCrawlItem,
+  ClassificationResult,
+  Signal,
+  Source,
+  StoreSignalResult,
+} from "../types";
 import { buildSignalIdentity, normalizeSignalUrl } from "./signal-identity";
 
 const db = admin.firestore;
@@ -8,7 +14,7 @@ export async function storeSignal(
   source: Source,
   item: RawCrawlItem,
   classification: ClassificationResult,
-): Promise<string> {
+): Promise<StoreSignalResult> {
   const normalizedUrl = normalizeSignalUrl(item.url);
   const signalIdentity = buildSignalIdentity({
     competitorId: source.competitorId,
@@ -60,7 +66,7 @@ export async function storeSignal(
       recommendedAction: classification.recommendedAction,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-    return legacyExisting.docs[0].id;
+    return { id: legacyExisting.docs[0].id, isNew: false };
   }
 
   const docRef = await db()
@@ -84,7 +90,7 @@ export async function storeSignal(
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-  return docRef.id;
+  return { id: docRef.id, isNew: true };
 }
 
 export async function getUndigestedSignals(
@@ -100,6 +106,19 @@ export async function getUndigestedSignals(
     )
     .orderBy("createdAt", "desc")
     .get();
+}
+
+export async function getSignalsByIds(signalIds: string[]): Promise<Signal[]> {
+  if (signalIds.length === 0) {
+    return [];
+  }
+
+  const refs = signalIds.map((signalId) => db().collection("signals").doc(signalId));
+  const docs = await db().getAll(...refs);
+
+  return docs
+    .filter((doc) => doc.exists)
+    .map((doc) => ({ id: doc.id, ...doc.data() }) as Signal);
 }
 
 export async function markSignalsDigested(
