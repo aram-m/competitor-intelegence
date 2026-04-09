@@ -40,14 +40,26 @@ cp .env.example .env
 
 - `GEMINI_API_KEY` for server-side Gemini classification
 - `GITHUB_TOKEN` if you want authenticated GitHub crawling
-- optional alerting:
-  - `ENABLE_ALERTS=true`
-  - `TELEGRAM_BOT_TOKEN`
-  - `TELEGRAM_CHAT_ID`
-  - `SLACK_BOT_TOKEN`
-  - `SLACK_CHANNEL_ID`
 
-3. Build functions:
+3. Optional: enable alerts
+
+Alerts are disabled by default. To turn them on, update `functions/.env`:
+
+```bash
+ENABLE_ALERTS=true
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+SLACK_BOT_TOKEN=
+SLACK_CHANNEL_ID=
+```
+
+Important:
+- Telegram alerts require both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`
+- Slack alerts require both `SLACK_BOT_TOKEN` and `SLACK_CHANNEL_ID`
+- If `ENABLE_ALERTS=true` but no valid Telegram or Slack keys are present, no alerts will be sent
+- You can configure Telegram only, Slack only, or both at the same time
+
+4. Build functions:
 
 ```bash
 npm run build
